@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<quizz>
+
+  <qa>
+    <question>Q: In which mythology was Chronos the father of all gods?</question>
+    <answer1>A. Roman</answer1>
+    <answer2>B. Greek</answer2>
+    <answer3>C. Egyptian</answer3>
+    <answer4>D. Chinese</answer4>
+    <correct>B</correct>
+  </qa>
+
+  <qa>
+    <question>Q: Who wrote the song Bohemian Rhapsody?</question>
+    <answer1>A. Led Zeppelin</answer1>
+    <answer2>B. Scorpions</answer2>
+    <answer3>C. Metallica</answer3>
+    <answer4>D. Queen</answer4>
+    <correct>D</correct>
+  </qa>
+
+  <qa>
+    <question>Q: What is the second most spoken language in the world?</question>
+    <answer1>A. German</answer1>
+    <answer2>B. French</answer2>
+    <answer3>C. Spanish</answer3>
+    <answer4>D. English</answer4>
+    <correct>C</correct>
+  </qa>
+  
+    <qa>
+    <question>Q: Where was the movie Ghost Rider – Spirit of Vengeance (2011) shot?</question>
+    <answer1>A. Italy</answer1>
+    <answer2>B. USA</answer2>
+    <answer3>C. Russia</answer3>
+    <answer4>D. Romania</answer4>
+    <correct>D</correct>
+  </qa>
+  
+    <qa>
+    <question>Q: Who invented the C programming language?</question>
+    <answer1>A. Dennis Ritchie</answer1>
+    <answer2>B. James Gosling</answer2>
+    <answer3>C. Guido van Rossum</answer3>
+    <answer4>D. Tim Berners-Lee</answer4>
+    <correct>A</correct>
+  </qa>
+  
+</quizz>

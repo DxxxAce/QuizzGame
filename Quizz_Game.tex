@@ -1,0 +1,161 @@
+
+\documentclass[runningheads]{llncs}
+\usepackage{lipsum}
+\usepackage{graphicx}
+\usepackage{float}
+\graphicspath{ {./images/} }
+\pagestyle{plain}
+
+\begin{document}
+
+\title{Quizz Game}
+\author{Hirtopanu Tudor-Alin (Grupa E1)}
+\institute{Facultatea de Informatica Iasi \\
+\email{1 Decembrie 2021}\\
+\url{}}
+\maketitle
+
+\begin{abstract}
+Acest document are ca scop prezentarea tehnologiilor utilizate, a arhitecturii si a detaliilor de implementare a proiectului propus Quizz Game (B).
+\end{abstract}
+\vskip 2cm
+
+\paragraph{\textbf {\large {Cuprins}}}
+\begin{enumerate}
+\item Introducere	........................................................................................	2
+\item Tehnologii utilizate	............................................................................	3
+\item Arhitectura aplicatiei	......................................................................... 6
+\item Detalii de implementare	..................................................................... 7
+\item Concluzii	..........................................................................................	10
+\item Bibliografie	.......................................................................................	11
+\end{enumerate}
+\newpage
+
+\section{Introducere}
+Scopul acestui proiect este de a dezvolta un server multithreading care sa permita accesul unui numar cat mai mare de clienti, ce vor raspunde pe rand unor intrebari stocate in fisiere XML. Serverul va retine scorurile fiecarui client in parte si le vor incrementa dupa fiecare raspuns corect. Clientii se pot conecta sau deconecta de la server in timpul jocului, fara sa afecteze desfasurarea acestuia in vreun fel.
+
+\subsection{Motivatie}
+Subiectul abordat de acest proiect imi aduce de o simulare a bine cunoscutului joc "\textbf{Vrei sa fii milionar}" pe care o jucam pe primul meu calculator atunci cand eram mic.
+Inca din copilarie m-au pasionat jocurile pe calculator, iar acesta este in opinia mea un clasic pe care oricine ar trebui sa il incerce macar o data.
+Motivul pentru care am ales acest subiect este ca am vrut sa capat un nivel minim de intelegere al procesului prin care a fost creat jocul mentionat mai sus.
+
+\begin{figure}[H]
+\centering
+\includegraphics{who_wants_to_be_a_millionaire}
+\caption{Jocul "\textbf{Vrei sa fii milionar}"}
+\end{figure}
+\newpage
+
+\section{Tehnologii utilizate}
+\subsection{Protocolul TCP}
+Pentru implementarea acestei aplicatii am folosit protocolul TCP (Transmission Control Protocol).
+TCP este un protocol de transport orientat conexiune, fara pierdere de informatii, ce controleaza fuxul de date.
+In comparatie cu protocolul UDP (User Datagram Protocol), acesta asigura integritatea mesajelor, precum si faptul ca mesajele ajung la destinatie in ordine cronologica.
+\begin{figure}[H]
+\centering
+\includegraphics{concurrent_tcp}
+\caption{Schema unei aplicatii de tip client-server}
+\end{figure}
+
+\subsection{Multithreading}
+Varianta protocolului TCP utilizata este cea cu fire de executie multiple (implementata cu ajutorul librariei \textbf{pthread.h}).
+Fiecare proces client are propriul sau fir de executie care trateaza desfasurarea jocului pentru respectivul jucator.
+Acest aspect asigura viteza desfasurarii jocului, in lipsa sa jucatorii fiind nevoiti sa ii astepte pe cei din fata pentru a raspunde la randul lor.
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{multiserver}
+\caption{Schema unui server cu fire de executie multiple}
+\end{figure}
+
+\subsection{Fisiere XML}
+Pentru stocarea intrebarilor si a raspunsurilor corespunzatoare acestora, am ales folosirea fisierelor de tip XML (Extensible Markup Language).
+XML este un API ce defineste un set de reguli pentru codificarea documentelor intr-un format ce poate fi inteles atat de oameni cat si de calculator.
+Ca format, acestea sunt similare limbajului HTML, ceea ce le face extrem de usor de citit chiar si pentru utilizatorii neexperimentati.
+Alte avantaje ale acestor fisiere consta in compatibilitatea cu majoritatea limbajelor de programare actuale, precum si extensibilitatea lor, utilizatorii avand optiunea de a crea propriile lor taguri, utilizand un limbaj adecvat domeniului de utilizare, care sa fie inteles cu usurinta de cei ce le folosesc.
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{html_xml}
+\caption{Similaritatea dintre HTML si XML}
+\end{figure}
+\newpage
+
+\section{Arhitectura aplicatiei}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{app_architecture}
+\caption{Schema minimalista a arhitecturii aplicatiei (la momentul actual)}
+\end{figure}
+\newpage
+
+\section{Detalii de implementare}
+\subsection{Idee generala}
+Am stabilit ca protocolul folosit pentru conexiunea dintre server si client este de tip TCP cu fire de executie multiple.
+Odata ce serverul accepta o noua conexiune, clientului ii este atribuit un fir de executie care se ocupa de acesta.
+Pentru stocarea datelor fiecarui client am utilizat cateva variabile globale si am definit un nou tip de date sub forma unei structuri \textbf{thread\_data}.
+\newline
+
+\noindent
+Fiecare fir de executie foloseste functia \textbf{handle\_connection()} pentru a trata clientul. 
+Aceasta apeleaza la randul ei functia  \textbf{play\_game()}, in care este implementata desfasurarea jocului.
+Serverul nu stocheaza utilizatorii intr-o baza de date. Ei se pot conecta cu orice nume doresc, iar atunci cand se deconecteaza jocul nu este afectat in niciun fel (decat daca nu a mai ramas niciun utilizator conectat).
+
+\subsection{Utilizare}
+Odata conectat la server, utilizatorul este nevoit sa se autentifice folosindu-se de comanda "\textbf{login : [username]}”.
+Momentan, aplicatia este conceputa astfel incat sa accepte orice nume de utilizator.
+Alternativ, el poate iesi cu totul din aplicatie apeland comanda "\textbf{quit}”.
+Dupa autentificare, clientul va incepe sa primeasca intrebarile, la care va trebui sa raspunda intr-un interval de maxim 60 de secunde.
+Cand toti clientii au raspuns la intrebare sau cand timpul s-a scurs, scorul fiecaruia este actualizat corespunzator si urmatoarea intrebare este adresata.
+Clientul are oricand posibilitatea de a parasi jocul folosind comanda "\textbf{logout}”.
+La final, adica atunci cand toate intrebarile au fost utilizate, jucatorii primesc un mesaj care ii anunta cine este castigatorul.
+
+\subsection{Exemple de cod sursa}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{thread_data}
+\caption{Structura pentru memorarea datelor despre clienti}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{client_socket}
+\caption{Implementarea socketului in procesul client}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{handle_connection}
+\caption{Functia \textbf{handle\_connection()} prin care firul de executie trateaza un client}
+\end{figure}
+\vskip 3cm
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{client_login}
+\caption{Functia \textbf{client\_login()} prin care se cere autentificarea utilizatorului}
+\end{figure}
+\newpage
+
+
+\section{Concluzii}
+Proiectul nu se afla in forma sa finala. Majoritatea functionalitatilor vor fi implementate ulterior predarii acestei documentatii.
+La randul ei, si aceasta documentatie va fi actualizata conform schimbarilor ce vor avea loc la nivelul proiectului.
+
+\subsection{Idei de dezvoltare}
+Cateva puncte tinta pentru starea finala a aplicatiei ar fi:
+\begin{itemize}
+\item o modalitate functionala de logare a clientilor la server
+\item implementarea fisierelor XML si stocarea datelor in acestea
+\item schimbul de date de tip intrebare-raspuns dintre client si server (prin introducerea unui username)
+\item afisarea scorului pentru fiecare client
+\item implementarea unui timp de raspuns adecvat pentru intrebari
+\end{itemize}
+\newpage
+
+\section{Bibliografie}
+\begin{itemize}
+\item https://profs.info.uaic.ro/$\sim$computernetworks/
+\item https://en.wikipedia.org/wiki/XML
+\item https://www.ibm.com/docs/en/i/7.3?topic=programming-xml-toolkit
+\item https://www.geeksforgeeks.org/handling-multiple-clients-on-server-with-multithreading-using-socket-programming-in-c-cpp/
+\end{itemize}
+
+\end{document}
